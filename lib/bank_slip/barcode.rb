@@ -85,6 +85,20 @@ module BankSlip
       self.value_indentification = '6'
     end
 
+    #Annotate a PDFWriter document with the barcode
+    #
+    #Valid options are:
+    #
+    #x, y   - The point in the document to start rendering from
+    #height - The height of the bars in PDF units
+    #xdim   - The X dimension in PDF units
+    #
+    #TODO extract from here
+    def pdf_barcode(pdf, data, x, y)
+      barcode = Barby::Code25Interleaved.new(data)
+      barcode.annotate_pdf(pdf, x: x, y: y, xdim: 0.85, height: 0.5.in)
+    end
+
     # Gives the 44 chars long string
     def to_s
       str = ""
@@ -98,9 +112,9 @@ module BankSlip
       str.gsub!(/^(\d{3})(\d{40})$/, '\1' + check_digit(str).to_s + '\2')
     end
 
-      def to_typeable
-        BankSlip::Barcode.to_typeable(to_s)
-      end
+    def to_typeable
+      BankSlip::Barcode.to_typeable(to_s)
+    end
 
     private
 
