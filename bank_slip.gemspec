@@ -9,8 +9,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Marco Moura"]
   spec.email         = ["marco.moura@gmail.com"]
 
-  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
+  spec.summary       = %q{Bank Slip for Municipal Collection Document.}
+  spec.description   = %q{Generate Bank Slip for Municipal Collection Document.}
   spec.homepage      = "TODO: Put your gem's website or public repo URL here."
 
   # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
@@ -28,9 +28,5 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "bundler", "~> 1.9"
   spec.add_dependency "barby"
-
-  spec.add_development_dependency "bundler", "~> 1.9"
-  spec.add_development_dependency "rake", "~> 10.0"
-  spec.add_development_dependency "rspec", "~> 3"
-  spec.add_development_dependency "pry"
+  spec.add_dependency "prawn"
 end

@@ -13,13 +13,16 @@
 # 24 – 44 | 21      | Campo livre de utilização da Empresa/Órgão | AAAAMMDD + uso livre
 #
 require 'bank_slip/check_digit'
+require 'barby'
+require 'barby/barcode/code_25_interleaved'
+require 'barby/outputter/prawn_outputter'
 
 module BankSlip
   class Barcode
     class << self
       #builder
       def decode(line)
-        parts = line.unpack(BankSlip::Barcode.seg_formatter(identification_length(line[1])))
+        parts = line.unpack(BankSlip::Barcode.seg_formatter(BankSlip::Barcode.identification_length(line[1])))
         bc = new
         if parts.size > 0
           bc.product               = parts[0]
@@ -48,8 +51,7 @@ module BankSlip
       #   7. Multas de transito
       #   9. Uso exclusivo do banco
       def identification_length(segment)
-        return 8 if %w{7 9}.include?(segment)
-        4
+        %w{7 9}.include?(segment) ? 8 : 4
       end
 
       # Creates the string used for unpack
@@ -57,6 +59,7 @@ module BankSlip
         "A1A1A1A1A11A#{code_length}A8A#{21-code_length}"
       end
 
+      # stub.barcode_data
       def to_typeable(barcode_data)
         barcode_data.scan(/(\d{11})/).collect do |p|
           d = BankSlip::CheckDigit.new(p.to_s)
@@ -78,38 +81,26 @@ module BankSlip
     end
 
     attr_accessor :document_number, :identification_code, :payment_date, :product,
-      :segment, :value, :value_indentification, :verification_digit
+                  :segment, :value, :value_indentification, :verification_digit
 
     def initialize
       self.product               = '8'
       self.value_indentification = '6'
     end
 
-    #Annotate a PDFWriter document with the barcode
-    #
-    #Valid options are:
-    #
-    #x, y   - The point in the document to start rendering from
-    #height - The height of the bars in PDF units
-    #xdim   - The X dimension in PDF units
-    #
-    #TODO extract from here
-    def pdf_barcode(pdf, data, x, y)
-      barcode = Barby::Code25Interleaved.new(data)
-      barcode.annotate_pdf(pdf, x: x, y: y, xdim: 0.85, height: 0.5.in)
-    end
-
+    #  stub.barcode_data = barcode.to_s
     # Gives the 44 chars long string
     def to_s
       str = ""
       str << product                                                       # product identification
       str << segment                                                       # segment identification
       str << value_indentification                                         # monetary identification
-      str << "%011d" % self.value                                               # value
+      str << "%011d" % self.value                                          # value
       str << identification_code                                           # identification code
-      str << payment_date.strftime('%Y%m%d')                               # payment date
+      str << payment_date.strftime('%Y%m%d')                              # payment date
       str << "%0#{21-BankSlip::Barcode.identification_length(segment)}d" % document_number  # document number
       str.gsub!(/^(\d{3})(\d{40})$/, '\1' + check_digit(str).to_s + '\2')
+      str
     end
 
     def to_typeable
