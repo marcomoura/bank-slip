@@ -13,17 +13,18 @@ describe BankSlip::Pdf do
         },
         stub: {
           segment: '1',
-          total: 656214,
-          identification_code: '00666',
-          due_date: '15/05/2015',
+          total: '6.562,14',
+          identification_code: '4444',
           payment_date: Date.today,
-          emission_date: '05/05/2015',
-          value:  4200,
-          fine_and_interest: 0,
-          adjustment: 0,
-          discounts: 0,
-          transaction_fee: 0,
           document_number: '00171',
+          due_date: '15/05/2015',
+          incidence: '04/2015',
+          emission_date: '05/05/2015',
+          value:  '42,00',
+          fine_and_interest: '1,00',
+          adjustment: '1,55',
+          discounts: '1,30',
+          transaction_fee: '1,01',
           revenue_description: 'DES-IF',
           other_information: nil,
           authorized_agents: nil
@@ -36,7 +37,9 @@ describe BankSlip::Pdf do
       }
     end
 
-    subject { PDF::Inspector::Text.analyze(described_class.render(data)).strings }
+    # let(:pdf) { described_class.new(data).create.render_file('test2.pdf') }
+    let(:pdf) { described_class.render(data) }
+    subject { PDF::Inspector::Text.analyze(pdf).strings }
 
     it { is_expected.to include(data[:header][:title]) }
     it { is_expected.to include(data[:header][:subtitle]) }

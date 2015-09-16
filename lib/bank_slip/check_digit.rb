@@ -5,16 +5,20 @@ module BankSlip
     end
 
     def calc
+      r = result
+      r == 10 ? 0 : r
+    end
+
+    private
+
+    def result
       result_string = ""
       @number.reverse.split("").each_with_index do |c, index|
         result_string << (c.to_i * ((1 + index) % 2 + 1)).to_s
       end
 
-      result = 10 - sum(result_string) % 10
-      result == 10 ? 0 : result
+      10 - sum(result_string) % 10
     end
-
-    private
 
     def sum(result_string)
       total = 0

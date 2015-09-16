@@ -112,14 +112,11 @@ module BankSlip
           draw_line("Outros Acréscimos (R$)",  @data[:stub][:adjustment],        @vVALUES_WIDTH, @vLINE_HEIGHT, 0, 3, 'FFFFFF',      false, :right)
           draw_line("Descontos (R$)",          "-#{@data[:stub][:discounts]}", @vVALUES_WIDTH, @vLINE_HEIGHT, 0, 4, 'FFFFFF',      false, :right)
           draw_line("Taxa de Expediente (R$)", @data[:stub][:transaction_fee], @vVALUES_WIDTH, @vLINE_HEIGHT, 0, 5, 'FFFFFF',      false, :right)
-          draw_line("Total (R$)",              t(@data[:stub][:total]),           @vVALUES_WIDTH, @vLINE_HEIGHT, 0, 6, 'E6E6E6', true,  :right)
+          draw_line("Total (R$)",              @data[:stub][:total],           @vVALUES_WIDTH, @vLINE_HEIGHT, 0, 6, 'E6E6E6', true,  :right)
         end # Values to the right
       end
     end
 
-    def t(cents)
-      (cents.to_i / (10 ** 2).to_f).to_s.sub('.', ',')
-    end
     def footer_payer
       bounding_box([0, bounds.top_left[1] - 0.1.in - @vHEADER_HEIGHT - @vBODY_HEIGHT],
                    width: 170.mm, height: 22.mm) do
@@ -222,25 +219,27 @@ module BankSlip
       bounding_box([-13, 65],
                    width: 7.65.in - @vFOOTER_LEFT_WIDTH,
                    height: @vFOOTER_HEIGHT) do
-        add_digit(barcode.to_typeable[0])
-        add_digit(barcode.to_typeable[1], 1.242.in)
-        add_digit(barcode.to_typeable[2], (1.242.in * 2))
-        add_digit(barcode.to_typeable[3], (1.242.in * 3))
+        add_digit(barcode.numerical_representation[0])
+        add_digit(barcode.numerical_representation[1], 1.242.in)
+        add_digit(barcode.numerical_representation[2], (1.242.in * 2))
+        add_digit(barcode.numerical_representation[3], (1.242.in * 3))
       end
       add_bar
     end
 
     def add_bar
-      Barby::Code25Interleaved.new(barcode)
+      Barby::Code25Interleaved.new(barcode.digits)
         .annotate_pdf(self, x: 0, y: -10, xdim: 0.85, height: 0.5.in)
     end
 
     def barcode
       @_barcode ||= BankSlip::Barcode.build(segment:             @data[:stub][:segment],
-                                            value:               @data[:stub][:total],
+                                            value:               @data[:stub][:total].to_s.gsub(/[\.,]/mi, ''),
                                             identification_code: @data[:stub][:identification_code],
                                             payment_date:        @data[:stub][:payment_date],
                                             document_number:     @data[:stub][:document_number])
+
+
     end
   end
 end
