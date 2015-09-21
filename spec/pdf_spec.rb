@@ -9,25 +9,31 @@ describe BankSlip::Pdf do
           title:    'PREFEITURA MUNICIPAL DE MACAPA',
           subtitle: 'SECRETARIA MUNICIPAL DE FINANCAS - SEMFI',
           document: 'Documento de Arrecadacao Municipal (DAM)',
-          logo:  nil
+          logo:  "#{File.dirname(__FILE__)}/fixtures/logo.jpg"
         },
         stub: {
           segment: '1',
-          total: '6.562,14',
-          identification_code: '4444',
-          payment_date: Date.today,
-          document_number: '00171',
-          due_date: '15/05/2015',
+          expiration_date: {
+            string: '25/01/2016',
+            date: Date.new(2016, 1, 25)
+          },
+          emission_date: '25/05/2015',
           incidence: '04/2015',
-          emission_date: '05/05/2015',
           value:  '42,00',
           fine_and_interest: '1,00',
           adjustment: '1,55',
           discounts: '1,30',
           transaction_fee: '1,01',
+          total: {
+            string: '44,26',
+            integer: 4426
+          },
+          document_number: '00171',
+          identification_code: '4444',
           revenue_description: 'DES-IF',
           other_information: nil,
-          authorized_agents: nil
+          authorized_agents: nil,
+          free_digits: 00171
         },
         payer: {
           official_name:  'BANCO DO BRASIL S/A',

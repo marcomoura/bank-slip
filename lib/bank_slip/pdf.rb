@@ -25,7 +25,7 @@ module BankSlip
       content(0, 'CONTRIBUINTE')
       footer_payer
       cut_line
-      content(5.85.in, 'BANCO')
+      content(5.3.in, 'BANCO')
       footer_payeer
       add_barcode
       self
@@ -49,7 +49,7 @@ module BankSlip
     end
 
     def copy_for(caption)
-      bounding_box [bounds.left, bounds.bottom_left[1] - 0.05.in], width: bounds.right, height: 0.82.in do
+      bounding_box [bounds.left - 0.05.in, bounds.top_left[1] - 0.7.in], width: bounds.right, height: 0.82.in do
         text "VIA #{caption}", size: 7, style: :normal, align: :right
       end
     end
@@ -62,32 +62,25 @@ module BankSlip
 
         # Info to the left
         bounding_box([0.in, bounds.top_left[1] - @vHEADER_HEIGHT], width: @vINFO_WIDTH, height: @vBODY_HEIGHT) do
-          # Bottom line
           stroke do
             stroke_color 'AAAAAA'
             line bounds.bottom_left, bounds.bottom_right
           end
 
-          draw_line("Nome Oficial",        @data[:payer][:official_name],         @vINFO_WIDTH,    @vLINE_HEIGHT, 0, 0, 'E6E6E6')
-          draw_line("CPF/CNPJ",            @data[:payer][:cpf_cnpj],              @vINFO_WIDTH/4,  @vLINE_HEIGHT, 0, 1)
-          draw_line("Inscrição Municipal", @data[:payer][:city_registration],     @vINFO_WIDTH/4,  @vLINE_HEIGHT, 1, 1)
-          draw_line("Emissão",             @data[:stub][:emission_date],  @vINFO_WIDTH/4,  @vLINE_HEIGHT, 2, 1, 'E6E6E6')
-          draw_line("Incidência",          @data[:stub][:incidence],        @vINFO_WIDTH/4,  @vLINE_HEIGHT, 3, 1, 'E6E6E6')
-          draw_line("Receita",             @data[:stub][:revenue_description],   @vINFO_WIDTH,    @vLINE_HEIGHT, 0, 2)
-
-          # bounding_box([0.in, bounds.top_left[1] - 3 * @vLINE_HEIGHT], width: @vINFO_WIDTH, height: 1.in) do
-          #   draw_line_text('Outras Informações', @data[:other_information], @vINFO_WIDTH, 1.in)
-          #   line bounds.bottom_left, bounds.bottom_right
+          draw_line("Nome Oficial"        , @data[:payer][:official_name]      , @vINFO_WIDTH   , @vLINE_HEIGHT , 0 , 0  , 'E6E6E6')
+          draw_line("CPF/CNPJ"            , @data[:payer][:cpf_cnpj]           , @vINFO_WIDTH/4 , @vLINE_HEIGHT , 0 , 1)
+          draw_line("Inscrição Municipal" , @data[:payer][:city_registration]  , @vINFO_WIDTH/4 , @vLINE_HEIGHT , 1 , 1)
+          draw_line("Emissão"             , @data[:stub][:emission_date]       , @vINFO_WIDTH/4 , @vLINE_HEIGHT , 2 , 1  , 'E6E6E6')
+          draw_line("Incidência"          , @data[:stub][:incidence]           , @vINFO_WIDTH/4 , @vLINE_HEIGHT , 3 , 1  , 'E6E6E6')
+          draw_line("Receita"             , @data[:stub][:revenue_description] , @vINFO_WIDTH   , @vLINE_HEIGHT , 0 , 2)
 
           move_down 0.1.in
           indent(0.1.in) do
             text 'Outras Informações', size: 8
             text @data[:stub][:other_information]
-            move_down 0.1.in
-            text "Documento No. #{@data[:stub][:document_number]}", size: 8
           end
 
-          text_box "PAGÁVEL EM QUALQUER AGENTE ARRECADADOR AUTORIZADO ATÉ #{@data[:stub][:payment_date].strftime('%d/%m/%Y')}.\n" +
+          text_box "PAGÁVEL EM QUALQUER AGENTE ARRECADADOR AUTORIZADO ATÉ #{@data[:stub][:expiration_date][:string]}.\n" +
                     "O VALOR PARA PAGAMENTO DESTE DOCUMENTO NÃO PODE SER ATUALIZADO. ",
                      at: [bounds.bottom_left[0] + 0.075.in, bounds.bottom_left[0] + 0.8.in],
                      height: 0.75.in,
@@ -106,26 +99,30 @@ module BankSlip
             line bounds.top_left, bounds.bottom_left
           end
 
-          draw_line("Vencimento da Guia", @data[:stub][:due_date], @vVALUES_WIDTH, @vLINE_HEIGHT, 0, 0, 'E6E6E6', false, :right)
-          draw_line("Valor (R$)", @data[:stub][:value], @vVALUES_WIDTH, @vLINE_HEIGHT, 0, 1, 'FFFFFF', false, :right)
-          draw_line("Multa/Juros (R$)",        @data[:stub][:fine_and_interest], @vVALUES_WIDTH, @vLINE_HEIGHT, 0, 2, 'FFFFFF',      false, :right)
-          draw_line("Outros Acréscimos (R$)",  @data[:stub][:adjustment],        @vVALUES_WIDTH, @vLINE_HEIGHT, 0, 3, 'FFFFFF',      false, :right)
-          draw_line("Descontos (R$)",          "-#{@data[:stub][:discounts]}", @vVALUES_WIDTH, @vLINE_HEIGHT, 0, 4, 'FFFFFF',      false, :right)
-          draw_line("Taxa de Expediente (R$)", @data[:stub][:transaction_fee], @vVALUES_WIDTH, @vLINE_HEIGHT, 0, 5, 'FFFFFF',      false, :right)
-          draw_line("Total (R$)",              @data[:stub][:total],           @vVALUES_WIDTH, @vLINE_HEIGHT, 0, 6, 'E6E6E6', true,  :right)
+          draw_line("Vencimento da Guia"      , @data[:stub][:expiration_date][:string]          , @vVALUES_WIDTH , @vLINE_HEIGHT , 0 , 0 , 'E6E6E6' , :right)
+          draw_line("Valor (R$)"              , @data[:stub][:value]             , @vVALUES_WIDTH , @vLINE_HEIGHT , 0 , 1 , 'FFFFFF' , :right)
+          draw_line("Multa/Juros (R$)"        , @data[:stub][:fine_and_interest] , @vVALUES_WIDTH , @vLINE_HEIGHT , 0 , 2 , 'FFFFFF' , :right)
+          draw_line("Outros Acréscimos (R$)"  , @data[:stub][:adjustment]        , @vVALUES_WIDTH , @vLINE_HEIGHT , 0 , 3 , 'FFFFFF' , :right)
+          draw_line("Descontos (R$)"          , "-#{@data[:stub][:discounts]}"   , @vVALUES_WIDTH , @vLINE_HEIGHT , 0 , 4 , 'FFFFFF' , :right)
+          draw_line("Taxa de Expediente (R$)" , @data[:stub][:transaction_fee]   , @vVALUES_WIDTH , @vLINE_HEIGHT , 0 , 5 , 'FFFFFF' , :right)
+          draw_line("Total (R$)"              , @data[:stub][:total][:string]    , @vVALUES_WIDTH , @vLINE_HEIGHT , 0 , 6 , 'E6E6E6' , :right  , '000000')
         end # Values to the right
       end
     end
 
     def footer_payer
-      bounding_box([0, bounds.top_left[1] - 0.1.in - @vHEADER_HEIGHT - @vBODY_HEIGHT],
-                   width: 170.mm, height: 22.mm) do
+      move_down 0.1.in
+      text "Documento No. #{@data[:stub][:document_number]}", size: 8
+      bounding_box([0, bounds.top_left[1] - 0.4.in - @vHEADER_HEIGHT - @vBODY_HEIGHT],
+                   width: 194.mm, height: 22.mm) do
+
         move_down 0.05.in
         indent 0.05.in do
-        text 'Autenticação Mecanica', size: 7, align: :left
+          text 'AUTENTICAÇÃO MECÂNICA', size: 7, align: :left
         end
+
         stroke do
-          stroke_color('999999')
+          stroke_color '999999'
           line bounds.top_left, bounds.top_right
           line bounds.top_left, bounds.bottom_left
         end
@@ -133,29 +130,25 @@ module BankSlip
     end
 
     def footer_payeer
+      move_down 0.1.in
+      text "Documento No. #{@data[:stub][:document_number]}", size: 8
       bounding_box([bounds.right - 2.55.in, bounds.bottom_left[1] + 0.7.in],
                    width: 65.mm, height: 22.mm) do
 
         move_down 0.05.in
         indent 0.03.in do
-          text 'Autenticação Mecanica', size: 7, align: :center
+          text 'AUTENTICAÇÃO MECÂNICA', size: 7, align: :center
         end
 
         stroke do
-          stroke_color('999999')
+          stroke_color '999999'
           line bounds.top_left, bounds.top_right
           line [bounds.top_left, 0], [bounds.top_left[0]+50, 0]
         end
       end
     end
 
-    def bank_Authentication
-      bounding_box [0.in, bounds.top_left[1] - 0.1.in], width: 2.15.in, height: 0.4.in do
-        text 'Autenticação Mecanica', size: 7, align: :center, style: :bold
-      end
-    end
-
-    def draw_line(label, value, width, height, column = 0, line = 0, bg_color = 'FFFFFF', stroke = false, align = :left)
+    def draw_line(label, value, width, height, column = 0, line = 0, bg_color = 'FFFFFF', align = :left, stroke = 'AAAAAA')
       bounding_box([0.in + column * width, bounds.top_left[1] - line * height], width: width, height: height) do
         if bg_color != 'FFFFFF'
           fill_color bg_color
@@ -166,13 +159,13 @@ module BankSlip
         end
 
         draw_line_text(label, value, width, height, align)
-        stroke_color(stroke ? '000000' : 'AAAAAA')
+        stroke_color stroke
         line_width 1
         stroke_bounds
       end
     end
 
-    def draw_line_text(label, value, width, height, align = :left)
+    def draw_line_text(label, value, width, height, align)
       bounding_box([bounds.top_left[0], bounds.top_left[1] - 0.05.in], width: width - 0.075.in, height: height - 0.05.in) do
         indent(0.075.in) do
           text label, size: 7, style: :normal, leading: 0.025.in
@@ -206,12 +199,12 @@ module BankSlip
       end
     end
 
-    def cut_line(x = 5.45.in)
+    def cut_line
       dash 3
-      stroke_line [bounds.left, x, bounds.right + 0.1.in, x]
+      stroke_line [bounds.left, 5.3.in, bounds.right + 0.1.in, 5.3.in]
       undash
       font 'ZapfDingbats' do
-        text_box "#", size: 18, rotate: 180, at: [bounds.right, x + 0.13.in]
+        text_box "#", size: 18, rotate: 180, at: [bounds.right, 5.3.in + 0.13.in]
       end
     end
 
@@ -233,13 +226,12 @@ module BankSlip
     end
 
     def barcode
-      @_barcode ||= BankSlip::Barcode.build(segment:             @data[:stub][:segment],
-                                            value:               @data[:stub][:total].to_s.gsub(/[\.,]/mi, ''),
-                                            identification_code: @data[:stub][:identification_code],
-                                            payment_date:        @data[:stub][:payment_date],
-                                            document_number:     @data[:stub][:document_number])
-
-
+      @_barcode ||= BankSlip::Barcode
+                      .new(segment:             @data[:stub][:segment],
+                           value:               @data[:stub][:total][:integer],
+                           identification_code: @data[:stub][:identification_code],
+                           payment_date:        @data[:stub][:expiration_date][:date],
+                           free_digits:         @data[:stub][:free_digits])
     end
   end
 end
