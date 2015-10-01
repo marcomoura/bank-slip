@@ -36,8 +36,8 @@ describe BankSlip::Pdf do
           payment_date: Date.new(2016, 1, 25),
           value: 987654321,
           identification_code: '4444',
-          free_digits: '00171',
-          segment: '1'
+          free_digits: '123456789',
+          segment: 1
         }
       }
     end
@@ -52,5 +52,9 @@ describe BankSlip::Pdf do
     it { is_expected.to include('Documento de Arrecadacao Municipal (DAM)') }
     it { is_expected.to include('VIA CONTRIBUINTE') }
     it { is_expected.to include('VIA BANCO') }
+    it { is_expected.to include("8#{data[:barcode][:segment]}630098765 7") }
+    it { is_expected.to include('43214444201 4') }
+    it { is_expected.to include('60125000000 2') }
+    it { is_expected.to include("00#{data[:barcode][:free_digits]} 7") }
   end
 end

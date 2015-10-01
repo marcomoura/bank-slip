@@ -27,30 +27,35 @@ module BankSlip
                    segment: 1, effective_reference: 6,
                    free_digits: 0, product: 8)
       @value               = value
+      @segment             = segment
       @identification_code = identification_code
       @payment_date        = payment_date
       @product             = product
-      @segment             = segment
       @effective_reference = effective_reference
       @free_digits         = free_digits
+      fail "identification_code #{identification_code} too long, #{identification_length} characters is the maximum allowed, for the segment #{segment}"  unless valid_identification_code?
     end
 
     # > barcode.digits
     # => "81640000000000100022010031000000000000000010"
     def digits
-      numbers.insert(3, digit(numbers).to_s)
+      @digits ||= numbers.insert(3, digit(numbers).to_s)
     end
 
     # > barcode.numerical_representation
     # => ["81640000000 5", "00010002201 1", "00310000000 3", "00000000010 9"]
     def numerical_representation
-      digits.scan(/\d{11}/).collect {|p| "#{p} #{digit(p)}" }
+      @numerical_representation ||= digits.scan(/\d{11}/).collect {|p| "#{p} #{digit(p)}" }
     end
 
     private
 
+    def valid_identification_code?
+      @identification_code.to_s.size.eql?(identification_length)
+    end
+
     def numbers
-      [
+      @numbers ||= [
         @product,
         @segment,
         @effective_reference,

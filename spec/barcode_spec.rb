@@ -11,9 +11,9 @@ describe BankSlip::Barcode do
     end
 
     context "should correctly create segment 1 string for 4 digits identification code" do
-      let(:code) { '1234' }
-      before { options.merge!(free_digits: '444') }
-      it { expect(subject.digits).to eq "81621000000000112342010031000000000000000444" }
+      let(:code) { '4444' }
+      before { options.merge!(free_digits: '17111111111111117') }
+      it { expect(subject.digits).to eq "816710000000001444420100310#{options[:free_digits]}" }
     end
 
     context "should correctly create segment 7 string for 8 digits identification code" do
