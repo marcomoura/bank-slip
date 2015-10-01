@@ -1,6 +1,6 @@
 module BankSlip
   class CheckDigit
-    def initialize(number)
+    def initialize(number:)
       @number = number
     end
 

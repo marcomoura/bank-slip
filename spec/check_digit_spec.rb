@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe BankSlip::CheckDigit do
   context ".calc" do
-    subject { described_class.new(number) }
+    subject { described_class.new(number: number) }
 
     context 'when the result is 1' do
       let(:number) { '8220000215048200974123220154098290108605940' }

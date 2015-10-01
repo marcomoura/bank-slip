@@ -1,17 +1,17 @@
 # Barcode data according to febraban specification
 #
 # POSITION | SIZE | CONTENT                  |
-# 01 – 01  | 1    | Product                  | Fixo: 8
-# 02 – 02  | 1    | Segment                  | Fixo: 1 para prefeituras
-# 03 – 03  | 1    | Real or Reference value  | 6 e mod10 para DV ou 8 e mod11 para DV
-# 04 – 04  | 1    | Dígito verificador geral | mod10 ou mod11
-# 05 – 15  | 11   | Value                    | valor em reais
+# 01 – 01  | 1    | Product                  | Fixed: 8
+# 02 – 02  | 1    | Segment                  | Fixed: 1 for City Halls
+# 03 – 03  | 1    | Real or Reference value  | 6 and mod10 for DV or 8 and mod11 for DV
+# 04 – 04  | 1    | Dígito verificador geral | mod10 or mod11
+# 05 – 15  | 11   | Value                    | value in Reais
 
-# 16 – 19  | 4    | Company or organization  | código de 4 digitos febraban
-# 20 – 44  | 25   | Free                     | AAAAMMDD + uso livre
+# 16 – 19  | 4    | Company or organization  | code of 4 digits febraban
+# 20 – 44  | 25   | Free                     | AAAAMMDD + free use
 
-# 16 – 23  | 8    | Company or organization  | código de 8 digitos banco (inicio CNPJ)
-# 24 – 44  | 21   | Free                     | AAAAMMDD + uso livre
+# 16 – 23  | 8    | Company or organization  | code of 8 digits bank (start CNPJ)
+# 24 – 44  | 21   | Free                     | AAAAMMDD + free use
 #
 #
 require 'barby'
@@ -23,14 +23,16 @@ module BankSlip
 
     # > options = {value: 1, identification_code: 2, document_number: 10, payment_date: Date.new(2010, 3, 10)}
     # > barcode = BankSlip::Barcode.new(options)
-    def initialize(options)
-      @product             = '8'
-      @segment             = options[:segment] || 1
-      @effective_reference = options[:effective_reference] || 6
-      @value               = options[:value]
-      @identification_code = options[:identification_code]
-      @payment_date        = options[:payment_date]
-      @free_digits         = options[:free_digits] || '0'
+    def initialize(value:, identification_code:, payment_date:,
+                   segment: 1, effective_reference: 6,
+                   free_digits: 0, product: 8)
+      @value               = value
+      @identification_code = identification_code
+      @payment_date        = payment_date
+      @product             = product
+      @segment             = segment
+      @effective_reference = effective_reference
+      @free_digits         = free_digits
     end
 
     # > barcode.digits
@@ -48,10 +50,16 @@ module BankSlip
     private
 
     def numbers
-      [@product, @segment, @effective_reference,
-       leading_zeros(@value), mask_id,
-       @payment_date.strftime('%Y%m%d'),
-       free_digits_leading_zeros].join('')
+      [
+        @product,
+        @segment,
+        @effective_reference,
+        leading_zeros(@value),
+        mask_id,
+        @payment_date.strftime('%Y%m%d'),
+        free_digits_leading_zeros
+      ]
+      .join('')
     end
 
     def leading_zeros(n, length = 11)
@@ -67,8 +75,8 @@ module BankSlip
       leading_zeros(@free_digits, length)
     end
 
-    def digit(bar_code_number)
-      d = BankSlip::CheckDigit.new(bar_code_number)
+    def digit(code_number)
+      d = BankSlip::CheckDigit.new(number: code_number)
       d.calc
     end
 

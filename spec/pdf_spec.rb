@@ -12,11 +12,7 @@ describe BankSlip::Pdf do
           logo:  "#{File.dirname(__FILE__)}/fixtures/logo.jpg"
         },
         stub: {
-          segment: '1',
-          expiration_date: {
-            string: '25/01/2016',
-            date: Date.new(2016, 1, 25)
-          },
+          expiration_date: '25/01/2016',
           emission_date: '25/05/2015',
           incidence: '04/2015',
           value:  '42,00',
@@ -24,21 +20,24 @@ describe BankSlip::Pdf do
           adjustment: '1,55',
           discounts: '1,30',
           transaction_fee: '1,01',
-          total: {
-            string: '44,26',
-            integer: 4426
-          },
+          total: '9.876.543,21',
           document_number: '00171',
           identification_code: '4444',
           revenue_description: 'DES-IF',
           other_information: nil,
           authorized_agents: nil,
-          free_digits: 00171
         },
         payer: {
           official_name:  'BANCO DO BRASIL S/A',
           city_registration: '00000002786',
           cpf_cnpj: '00000002786',
+        },
+        barcode: {
+          payment_date: Date.new(2016, 1, 25),
+          value: 987654321,
+          identification_code: '4444',
+          free_digits: '00171',
+          segment: '1'
         }
       }
     end

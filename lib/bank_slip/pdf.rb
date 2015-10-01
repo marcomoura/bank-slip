@@ -80,7 +80,7 @@ module BankSlip
             text @data[:stub][:other_information]
           end
 
-          text_box "PAGÁVEL EM QUALQUER AGENTE ARRECADADOR AUTORIZADO ATÉ #{@data[:stub][:expiration_date][:string]}.\n" +
+          text_box "PAGÁVEL EM QUALQUER AGENTE ARRECADADOR AUTORIZADO ATÉ #{@data[:stub][:expiration_date]}.\n" +
                     "O VALOR PARA PAGAMENTO DESTE DOCUMENTO NÃO PODE SER ATUALIZADO. ",
                      at: [bounds.bottom_left[0] + 0.075.in, bounds.bottom_left[0] + 0.8.in],
                      height: 0.75.in,
@@ -99,13 +99,13 @@ module BankSlip
             line bounds.top_left, bounds.bottom_left
           end
 
-          draw_line("Vencimento da Guia"      , @data[:stub][:expiration_date][:string]          , @vVALUES_WIDTH , @vLINE_HEIGHT , 0 , 0 , 'E6E6E6' , :right)
+          draw_line("Vencimento da Guia"      , @data[:stub][:expiration_date]          , @vVALUES_WIDTH , @vLINE_HEIGHT , 0 , 0 , 'E6E6E6' , :right)
           draw_line("Valor (R$)"              , @data[:stub][:value]             , @vVALUES_WIDTH , @vLINE_HEIGHT , 0 , 1 , 'FFFFFF' , :right)
           draw_line("Multa/Juros (R$)"        , @data[:stub][:fine_and_interest] , @vVALUES_WIDTH , @vLINE_HEIGHT , 0 , 2 , 'FFFFFF' , :right)
           draw_line("Outros Acréscimos (R$)"  , @data[:stub][:adjustment]        , @vVALUES_WIDTH , @vLINE_HEIGHT , 0 , 3 , 'FFFFFF' , :right)
           draw_line("Descontos (R$)"          , "-#{@data[:stub][:discounts]}"   , @vVALUES_WIDTH , @vLINE_HEIGHT , 0 , 4 , 'FFFFFF' , :right)
           draw_line("Taxa de Expediente (R$)" , @data[:stub][:transaction_fee]   , @vVALUES_WIDTH , @vLINE_HEIGHT , 0 , 5 , 'FFFFFF' , :right)
-          draw_line("Total (R$)"              , @data[:stub][:total][:string]    , @vVALUES_WIDTH , @vLINE_HEIGHT , 0 , 6 , 'E6E6E6' , :right  , '000000')
+          draw_line("Total (R$)"              , @data[:stub][:total]    , @vVALUES_WIDTH , @vLINE_HEIGHT , 0 , 6 , 'E6E6E6' , :right  , '000000')
         end # Values to the right
       end
     end
@@ -226,12 +226,7 @@ module BankSlip
     end
 
     def barcode
-      @_barcode ||= BankSlip::Barcode
-                      .new(segment:             @data[:stub][:segment],
-                           value:               @data[:stub][:total][:integer],
-                           identification_code: @data[:stub][:identification_code],
-                           payment_date:        @data[:stub][:expiration_date][:date],
-                           free_digits:         @data[:stub][:free_digits])
+      @_barcode ||= BankSlip::Barcode.new(@data[:barcode])
     end
   end
 end
