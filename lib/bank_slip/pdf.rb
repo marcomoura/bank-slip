@@ -77,7 +77,7 @@ module BankSlip
           move_down 0.1.in
           indent(0.1.in) do
             text 'Outras Informações', size: 8
-            text @data[:stub][:other_information]
+            text @data[:stub][:other_information], size: 8
           end
 
           text_box "PAGÁVEL EM QUALQUER AGENTE ARRECADADOR AUTORIZADO ATÉ #{@data[:stub][:expiration_date]}.\n" +

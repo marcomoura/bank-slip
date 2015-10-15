@@ -6,9 +6,9 @@ describe BankSlip::Pdf do
     let(:data) do
       {
         header:{
-          title:    'PREFEITURA MUNICIPAL DE MACAPA',
+          title:    'PREFEITURA MUNICIPAL DE MACAPÁ',
           subtitle: 'SECRETARIA MUNICIPAL DE FINANCAS - SEMFI',
-          document: 'Documento de Arrecadacao Municipal (DAM)',
+          document: 'Documento de Arrecadação Municipal (DAM)',
           logo:  "#{File.dirname(__FILE__)}/fixtures/logo.jpg"
         },
         stub: {
@@ -49,7 +49,7 @@ describe BankSlip::Pdf do
     it { is_expected.to include(data[:header][:title]) }
     it { is_expected.to include(data[:header][:subtitle]) }
     it { is_expected.to include(data[:header][:document]) }
-    it { is_expected.to include('Documento de Arrecadacao Municipal (DAM)') }
+    it { is_expected.to include('Documento de Arrecadação Municipal (DAM)') }
     it { is_expected.to include('VIA CONTRIBUINTE') }
     it { is_expected.to include('VIA BANCO') }
     it { is_expected.to include("8#{data[:barcode][:segment]}630098765 7") }
